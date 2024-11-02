@@ -27,6 +27,7 @@ def read_data(data_path):
 
     return df_accident, df_vehicle
 
+
 if __name__ == "__main__":
     dst_folder = "./data"
     run_download = False
