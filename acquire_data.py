@@ -18,11 +18,11 @@ def download_dataset(dst_folder):
     return dst_folder
 
 
-def read_data(data_path):
+def read_data(data_path, accident_fp="Accident_Information.csv", vehicle_fp="Vehicle_Information.csv"):
     """ Read data from accidents and vehicles """
-    with open(os.path.join(data_path, "Accident_Information.csv"), "r") as f:
+    with open(os.path.join(data_path, accident_fp), "r") as f:
         df_accident = pd.read_csv(f, dtype='unicode')
-    with open(os.path.join(data_path, "Vehicle_Information.csv"), "r") as f:
+    with open(os.path.join(data_path, vehicle_fp), "r") as f:
         df_vehicle = pd.read_csv(f, dtype='unicode')
 
     return df_accident, df_vehicle
@@ -34,4 +34,9 @@ if __name__ == "__main__":
 
     if run_download:
         download_dataset(dst_folder)
-    read_data(dst_folder)
+    df_accident, df_vehicle = read_data(dst_folder)
+
+    with open(f"{dst_folder}/accident_info.csv", "w") as f:
+        df_accident.iloc[:int(len(df_accident) // 10)].to_csv(f)
+    with open(f"{dst_folder}/vehicle_info.csv", "w") as f:
+        df_vehicle.iloc[:int(len(df_vehicle) // 10)].to_csv(f)
