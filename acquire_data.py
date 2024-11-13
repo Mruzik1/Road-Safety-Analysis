@@ -36,7 +36,7 @@ if __name__ == "__main__":
         download_dataset(dst_folder)
     df_accident, df_vehicle = read_data(dst_folder)
 
-    with open(f"{dst_folder}/accident_info.csv", "w") as f:
-        df_accident.iloc[:int(len(df_accident) // 10)].to_csv(f)
-    with open(f"{dst_folder}/vehicle_info.csv", "w") as f:
-        df_vehicle.iloc[:int(len(df_vehicle) // 10)].to_csv(f)
+    # with open(f"{dst_folder}/accident_info.csv", "w") as f:
+    df_accident.iloc[:int(len(df_accident) // 10)].to_csv(f"{dst_folder}/accident_info.csv", index=False)
+    # with open(f"{dst_folder}/vehicle_info.csv", "w") as f:
+    df_vehicle.iloc[:int(len(df_vehicle) // 10)].to_csv(f"{dst_folder}/vehicle_info.csv", index=False)

@@ -21,7 +21,8 @@ def drop_choosen_attributes(df: pd.DataFrame) -> pd.DataFrame:
     attrs2drop = find_nan_attributes(df)
     
     # drop redundant attributes and columns with unique identifiers
-    attrs2drop += ["Unnamed: 0_x", "Unnamed: 0_y", "Accident_Index", "Year_x", "Year_y"]
+    # attrs2drop += ["Unnamed: 0_x", "Unnamed: 0_y", "Accident_Index", "Year_x", "Year_y"]
+    attrs2drop += ["Accident_Index", "Year_x", "Year_y"]
 
     # drop location-specific info
     attrs2drop += [
@@ -97,6 +98,47 @@ def plot_distribution(
     else:
         plt.show()
 
+def box_plot(
+    df: pd.DataFrame,
+    attributes: List[str],
+    save: bool = False,
+    folder: str = "./visualizations"
+):
+    """ Plot box plots for a list of attributes """
+    for attribute in attributes:
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(data=df[attribute],showfliers=False)
+        plt.title(f'Boxplot of {attribute}')
+        plt.xlabel('Attributes')
+        plt.ylabel('Value')
+            
+        if save:
+            # attributes_str = "_".join(attributes)
+            filename = f"{attribute}_boxplot.png"
+            save_plot(plt, folder, filename)
+        else:
+            plt.show()
+
+def scatter_plot(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    save: bool = False,
+    folder: str = "./visualizations"
+):
+    """ Plot a scatter plot for two attributes """
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df, x=x, y=y)
+    plt.title(f'Scatter plot of {x} and {y}')
+    plt.xlabel(x)
+    plt.ylabel(y)
+    
+    if save:
+        filename = f"{x}_{y}_scatterplot.png"
+        save_plot(plt, folder, filename)
+    else:
+        plt.show()
+
 
 if __name__ == "__main__":
     dst_folder = "./data"
@@ -115,3 +157,6 @@ if __name__ == "__main__":
     draw_correlation_matrix(df_merged, save=True)
     plot_distribution(df_merged, attribute="Age_Band_of_Driver", save=True)
     plot_distribution(df_merged, attribute="Accident_Severity", save=True)
+    box_plot(df_merged, attributes=['Age_of_Vehicle', 'Engine_Capacity_.CC.', 'Driver_IMD_Decile'], save=True)
+    scatter_plot(df_merged, x='Vehicle_Reference', y='Number_of_Vehicles', save=True)
+    scatter_plot(df_merged, x='Number_of_Vehicles', y='Number_of_Casualties', save=True)
