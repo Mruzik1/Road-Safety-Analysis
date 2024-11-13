@@ -134,7 +134,7 @@ def scatter_plot(
     plt.ylabel(y)
     
     if save:
-        filename = f"{x}_{y}_scatterplot.png"
+        filename = f"{x}_and_{y}_scatterplot.png"
         save_plot(plt, folder, filename)
     else:
         plt.show()
