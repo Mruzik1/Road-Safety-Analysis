@@ -8,7 +8,7 @@ from acquire_data import read_data, download_dataset
 
 def find_nan_attributes(
     df: pd.DataFrame, 
-    nan_threshold: float = 0.5
+    nan_threshold: float = 0.4
 ) -> List[Any]:
     """ Find columns with high percentage of nan values """
     nan_percentage = df.isna().mean()
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     df_merged['Speed_limit'] = df_merged['Speed_limit'].astype(float)
     df_merged['Engine_Capacity_.CC.'] = df_merged['Engine_Capacity_.CC.'].astype(float)
     df_merged['Age_of_Vehicle'] = df_merged['Age_of_Vehicle'].astype(float)
-
+    df_merged.to_csv("./data/merged_data.csv", index=False)
     severity_mapping = {'Slight': 1, 'Serious': 2, 'Fatal': 3}
     df_merged['Severity_Num'] = df_merged['Accident_Severity'].map(severity_mapping)
 
@@ -174,5 +174,5 @@ if __name__ == "__main__":
     plot_distribution(df_merged, attribute="Accident_Severity", save=True)
     box_plot(df_merged, x='Accident_Severity', y='Speed_limit', name='Speed Limit by Accident Severity', xlabel='Accident Severity', ylabel='Speed Limit (mph)', save=True)
     box_plot(df_merged, x='Age_of_Vehicle', y='Engine_Capacity_.CC.', name='Engine Capacity by Age of Vehicle', xlabel='Age of Vehicle (years)', ylabel='Engine Capacity (CC)', save=True)
-    scatter_plot(df_merged, x='Engine_Capacity_.CC.', y='Severity_Num', xlabel='Engine Capacity (CC)', ylabel='Accident Severity (Numerical)', dop=[[1, 2, 3], ['Slight', 'Serious', 'Fatal']], save=True)
-    scatter_plot(df_merged, x='Age_of_Vehicle', y='Severity_Num',xlabel='Age of Vehicle (years)', ylabel='Accident Severity (Numerical)', dop=[[1, 2, 3], ['Slight', 'Serious', 'Fatal']], save=True)
+    # scatter_plot(df_merged, x='Engine_Capacity_.CC.', y='Severity_Num', xlabel='Engine Capacity (CC)', ylabel='Accident Severity (Numerical)', dop=[[1, 2, 3], ['Slight', 'Serious', 'Fatal']], save=True)
+    # scatter_plot(df_merged, x='Age_of_Vehicle', y='Severity_Num',xlabel='Age of Vehicle (years)', ylabel='Accident Severity (Numerical)', dop=[[1, 2, 3], ['Slight', 'Serious', 'Fatal']], save=True)
