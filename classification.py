@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 import pandas as pd
 
+
 def classification(data: pd.DataFrame ,save: bool=False):
     # Balancing
     X_resampled, y_resampled = smote_balance(data=data, columns_to_use=[

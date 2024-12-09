@@ -24,6 +24,7 @@ def scale_data(
             return train_data, test_data, scaler
         return train_data, test_data
 
+
 def preprocesing_knn(
         path_to_merged_data: str = None,
         data: pd.DataFrame = None,
@@ -68,6 +69,7 @@ def preprocesing_knn(
     if output_path:
         data.to_csv(output_path, index=False)
     return data
+
 
 def smote_balance(
         path_to_preprocesed_data: str=None,
