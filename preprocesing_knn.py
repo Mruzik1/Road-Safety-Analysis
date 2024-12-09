@@ -6,6 +6,24 @@ from imblearn.over_sampling import SMOTE
 from typing import List, Any
 from sklearn.preprocessing import LabelEncoder
 
+def scale_data(
+        train_data: pd.DataFrame,
+        test_data: pd.DataFrame = None,
+        inverse: bool = False
+    ) -> pd.DataFrame:
+    scaler = StandardScaler()
+    if test_data is None:
+        train_data = scaler.fit_transform(train_data)
+        if inverse:
+            return train_data, scaler
+        return train_data
+    else:
+        train_data = scaler.fit_transform(train_data)
+        test_data = scaler.transform(test_data)
+        if inverse:
+            return train_data, test_data, scaler
+        return train_data, test_data
+
 def preprocesing_knn(
         path_to_merged_data: str = None,
         data: pd.DataFrame = None,
@@ -36,8 +54,7 @@ def preprocesing_knn(
 
     numerical_data = data[numerical_columns]
 
-    scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(numerical_data)
+    scaled_data, scaler = scale_data(numerical_data, inverse=True)
 
     knn_imputer = KNNImputer(n_neighbors=5)
     imputed_data = knn_imputer.fit_transform(scaled_data)
