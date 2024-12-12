@@ -5,12 +5,28 @@ from sklearn.impute import SimpleImputer
 from imblearn.over_sampling import SMOTE
 from typing import List, Any
 from sklearn.preprocessing import LabelEncoder
+import numpy as np
 
 def scale_data(
         train_data: pd.DataFrame,
         test_data: pd.DataFrame = None,
         inverse: bool = False
     ) -> pd.DataFrame:
+    """
+    Scale the data using StandardScaler.
+
+    Parameters:
+    - train_data: pd.DataFrame
+        The training data to scale.
+    - test_data: pd.DataFrame
+        The test data to scale (optional).
+    - inverse: bool
+        Whether to return the scaler for inverse transformation.
+
+    Returns:
+    - pd.DataFrame
+        Scaled training data (and test data if provided).
+    """
     scaler = StandardScaler()
     if test_data is None:
         train_data = scaler.fit_transform(train_data)
@@ -30,7 +46,21 @@ def preprocesing_knn(
         data: pd.DataFrame = None,
         output_path: str = None
     ):
-    # Load the data
+    """
+    Preprocess the data using KNN imputation.
+
+    Parameters:
+    - path_to_merged_data: str
+        Path to the merged data CSV file.
+    - data: pd.DataFrame
+        The input dataframe (optional).
+    - output_path: str
+        Path to save the processed data (optional).
+
+    Returns:
+    - pd.DataFrame
+        The processed dataframe.
+    """
     if data is None and path_to_merged_data is not None:
         data = pd.read_csv(path_to_merged_data)
     elif data is None and path_to_merged_data is None:
@@ -39,9 +69,17 @@ def preprocesing_knn(
     print("Before imputation:")
     print(data.isnull().sum())
 
-    frequent_imputer = SimpleImputer(strategy="most_frequent")
-    data["Propulsion_Code"] = frequent_imputer.fit_transform(data[["Propulsion_Code"]]).ravel()
+    non_numeric_columns = data.select_dtypes(exclude=[np.number])
+    columns_with_nulls = non_numeric_columns.columns[non_numeric_columns.isnull().any()]
+
+
+    for column in columns_with_nulls:
+        frequent_imputer = SimpleImputer(strategy="most_frequent")
+        data[column] = frequent_imputer.fit_transform(data[[column]]).ravel()
+    imdimputer = SimpleImputer(strategy="mean")
+    data["Driver_IMD_Decile"] = imdimputer.fit_transform(data[["Driver_IMD_Decile"]]).ravel()
     data = data.dropna(subset=["Time"])
+
 
     numerical_columns = [
         'Age_of_Vehicle', 
@@ -86,6 +124,23 @@ def smote_balance(
         ],
         key_column: List[str] = ["Accident_Severity"]
     ):
+    """
+    Balance the data using SMOTE.
+
+    Parameters:
+    - path_to_preprocesed_data: str
+        Path to the preprocessed data CSV file (optional).
+    - data: pd.DataFrame
+        The input dataframe (optional).
+    - columns_to_use: List[str]
+        List of columns to use for balancing.
+    - key_column: List[str]
+        The target column for balancing.
+
+    Returns:
+    - Tuple[pd.DataFrame, pd.Series]
+        The balanced features and target.
+    """
     if data is None and path_to_preprocesed_data is  None:
         return None, None
     elif data is None and path_to_preprocesed_data is not None:

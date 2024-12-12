@@ -5,26 +5,40 @@ from typing import List, Any
 
 from acquire_data import read_data, download_dataset
 
-
 def find_nan_attributes(
     df: pd.DataFrame, 
     nan_threshold: float = 0.4
 ) -> List[Any]:
-    """ Find columns with high percentage of nan values """
+    """
+    Find columns with high percentage of nan values.
+    
+    Parameters:
+    - df: pd.DataFrame
+        The input dataframe.
+    - nan_threshold: float
+        The threshold percentage of nan values to consider a column as having high nan values.
+    
+    Returns:
+    - List[Any]
+        List of column names with high percentage of nan values.
+    """
     nan_percentage = df.isna().mean()
     return nan_percentage[nan_percentage > nan_threshold].index.tolist()
 
-
 def drop_choosen_attributes(df: pd.DataFrame) -> pd.DataFrame:
-    """ Drop choosen attributes """
-    # drop columns with high nan %
-    attrs2drop = find_nan_attributes(df)
+    """
+    Drop chosen attributes from the dataframe.
     
-    # drop redundant attributes and columns with unique identifiers
-    # attrs2drop += ["Accident_Index", "Year_x", "Year_y"]
+    Parameters:
+    - df: pd.DataFrame
+        The input dataframe.
+    
+    Returns:
+    - pd.DataFrame
+        The dataframe with chosen attributes dropped.
+    """
+    attrs2drop = find_nan_attributes(df)
     attrs2drop += ["Accident_Index", "Year_x", "Year_y"]
-
-    # drop location-specific info
     attrs2drop += [
         "1st_Road_Number", 
         "2nd_Road_Number", 
@@ -36,18 +50,24 @@ def drop_choosen_attributes(df: pd.DataFrame) -> pd.DataFrame:
         "Local_Authority_(District)",
         "Local_Authority_(Highway)"
     ]
-
-    # drop other unnecessary attributes 
     attrs2drop += [
-        "Was_Vehicle_Left_Hand_Drive",       # highly low percentage of values other than "No" - ~0.05%
-        "model"                              # too many unique values / limited analytical impact
+        "Was_Vehicle_Left_Hand_Drive",
+        "model"
     ]
-
     return df.drop(attrs2drop, axis=1)
 
-
 def save_plot(plot, folder: str, filename: str):
-    """ Save a plot to a specific folder with a specific name """
+    """
+    Save a plot to a specific folder with a specific name.
+    
+    Parameters:
+    - plot: matplotlib.pyplot
+        The plot to save.
+    - folder: str
+        The folder to save the plot in.
+    - filename: str
+        The name of the file to save the plot as.
+    """
     import os
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -55,14 +75,25 @@ def save_plot(plot, folder: str, filename: str):
     plot.savefig(plot_path)
     print(f"Plot saved to {plot_path}")
 
-
 def draw_correlation_matrix(
     df: pd.DataFrame, 
     save: bool = False, 
     folder: str = "./visualizations", 
     filename: str = "correlation_matrix.png"
 ):
-    """ Draw a correlation matrix for the dataframe """
+    """
+    Draw a correlation matrix for the dataframe.
+    
+    Parameters:
+    - df: pd.DataFrame
+        The input dataframe.
+    - save: bool
+        Whether to save the plot.
+    - folder: str
+        The folder to save the plot in.
+    - filename: str
+        The name of the file to save the plot as.
+    """
     df_numeric = df.apply(pd.to_numeric, errors='coerce')
     df_numeric = df_numeric.dropna(axis=1, how='all')
     corr = df_numeric.corr()
@@ -76,7 +107,6 @@ def draw_correlation_matrix(
     else:
         plt.show()
 
-
 def plot_distribution(
     df: pd.DataFrame, 
     attribute: str, 
@@ -84,7 +114,21 @@ def plot_distribution(
     folder: str = "./visualizations", 
     filename: str = None
 ):
-    """ Plot a values distribution (histogram) for a specific attribute """
+    """
+    Plot a values distribution (histogram) for a specific attribute.
+    
+    Parameters:
+    - df: pd.DataFrame
+        The input dataframe.
+    - attribute: str
+        The attribute to plot the distribution for.
+    - save: bool
+        Whether to save the plot.
+    - folder: str
+        The folder to save the plot in.
+    - filename: str
+        The name of the file to save the plot as.
+    """
     plt.figure(figsize=(10, 6))
     sns.histplot(df[attribute].dropna())
     plt.title(f'Distribution of {attribute}')
@@ -108,7 +152,27 @@ def box_plot(
     save: bool = False,
     folder: str = "./visualizations"
 ):
-    """ Plot box plots for a list of attributes """
+    """
+    Plot box plots for a list of attributes.
+    
+    Parameters:
+    - df: pd.DataFrame
+        The input dataframe.
+    - x: str
+        The attribute for the x-axis.
+    - y: str
+        The attribute for the y-axis.
+    - name: str
+        The name of the plot.
+    - xlabel: str
+        The label for the x-axis.
+    - ylabel: str
+        The label for the y-axis.
+    - save: bool
+        Whether to save the plot.
+    - folder: str
+        The folder to save the plot in.
+    """
     plt.figure(figsize=(10, 6))
     sns.boxplot(data=df,x=x,y=y,showfliers=False)
     plt.title(f'{name} boxplot')
@@ -131,7 +195,27 @@ def scatter_plot(
     save: bool = False,
     folder: str = "./visualizations"
 ):
-    """ Plot a scatter plot for two attributes """
+    """
+    Plot a scatter plot for two attributes.
+    
+    Parameters:
+    - df: pd.DataFrame
+        The input dataframe.
+    - x: str
+        The attribute for the x-axis.
+    - y: str
+        The attribute for the y-axis.
+    - xlabel: str
+        The label for the x-axis.
+    - ylabel: str
+        The label for the y-axis.
+    - dop: List[List[Any]]
+        Optional parameter for y-axis ticks.
+    - save: bool
+        Whether to save the plot.
+    - folder: str
+        The folder to save the plot in.
+    """
     plt.figure(figsize=(10, 6))
     plt.scatter(df[x], df[y])
     plt.title(f'Scatter plot of {xlabel} and {ylabel}')
@@ -146,7 +230,6 @@ def scatter_plot(
     else:
         plt.show()
 
-
 if __name__ == "__main__":
     dst_folder = "./data"
     run_download = False
@@ -154,7 +237,7 @@ if __name__ == "__main__":
     if run_download:
         download_dataset(dst_folder)
 
-    df_accident, df_vehicle = read_data(dst_folder, accident_fp="accident_info.csv", vehicle_fp="vehicle_info.csv")
+    df_accident, df_vehicle = read_data(dst_folder, accident_fp="Accident_Information.csv", vehicle_fp="Vehicle_Information.csv")
     df_merged = pd.merge(df_vehicle, df_accident, on="Accident_Index", how="inner")
     print(f"Merged size: {len(df_merged)}")
 
